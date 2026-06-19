@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trabajo de Investigación: Conectividad de Sistemas y Bases de Datos</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="main-container">
+        <div class="header-banner">
+            <h1>Trabajo de Investigación: Conectividad y Bases de Datos</h1>
+            <p>Análisis de mecanismos de conexión en lenguajes de programación, herramientas de gestión y ecosistemas de almacenamiento.</p>
+        </div>
+
+        <div class="content-body">
+            <div class="callout-box">
+                <h3>Aclaraciones Conceptuales Iniciales</h3>
+                <ul>
+                    <li><strong>HTML, CSS y HTTP no poseen lógica de conexión:</strong> HTML y CSS operan exclusivamente en el cliente. HTTP es el protocolo de transferencia. El frontend realiza peticiones HTTP hacia un servicio backend, y es este último el que interactúa directamente con la base de datos.</li>
+                    <li><strong>HeidiSQL y XAMPP no son bases de datos:</strong> HeidiSQL es un cliente gráfico de administración, mientras que XAMPP es un entorno local de desarrollo que agrupa un servidor web (Apache) y un sistema gestor (MariaDB).</li>
+                    <li><strong>JSON Server es una herramienta de simulación:</strong> No constituye un motor de base de datos relacional ni NoSQL; emula una API REST de manera local a partir de un archivo estructurado en JSON.</li>
+                </ul>
+            </div>
+
+            <h2>1. Conexión a Bases de Datos desde Lenguajes de Programación</h2>
+            <p>Cada entorno de ejecución implementa diferentes capas de abstracción para interactuar con los sistemas de almacenamiento, ya sea mediante llamadas de bajo nivel o asignaciones orientadas a objetos:</p>
+            
+            <ul>
+                <li><strong>C y C++:</strong> Al carecer de una capa de gestión nativa unificada, dependen de las APIs en C específicas proporcionadas por los propios fabricantes (como <code>libpq</code> para PostgreSQL o <code>mysql.h</code> para MySQL) o de la interfaz estándar universal <strong>ODBC</strong> (Open Database Connectivity).</li>
+                <li><strong>C#:</strong> Utiliza el ecosistema de componentes <strong>ADO.NET</strong> mediante proveedores específicos (como <code>SqlClient</code>). En proyectos modernos, se implementa a través de un ORM (Object-Relational Mapping) llamado <strong>Entity Framework Core</strong>, abstrayendo las consultas en código estructurado orientado a objetos.</li>
+                <li><strong>Java:</strong> La plataforma se conecta mediante la API estándar <strong>JDBC</strong> (Java Database Connectivity). Requiere que se añada el controlador (driver JAR) específico del motor de base de datos al proyecto. Comúnmente se complementa con ORMs como <strong>Hibernate</strong>.</li>
+                <li><strong>Python:</strong> Sigue las directrices de la especificación estándar de la industria PEP 249 (Python DB-API 2.0). Implementa librerías dedicadas como <code>psycopg2</code> para PostgreSQL o <code>mysql-connector-python</code>. Para la gestión avanzada basada en objetos, adopta herramientas como <strong>SQLAlchemy</strong>.</li>
+                <li><strong>JavaScript (Node.js):</strong> Debido a restricciones de seguridad, JS en el navegador no posee acceso directo a sistemas de archivos o puertos de red de bases de datos. No obstante, en el entorno de servidor con Node.js, utiliza módulos de la comunidad (<code>pg</code>, <code>mysql2</code>) o herramientas de mapeo de datos avanzadas como <strong>Prisma</strong> o <strong>Mongoose</strong>.</li>
+            </ul>
+
+            <h2>2. Clasificación y Mecanismos de Conexión de Herramientas y Motores</h2>
+            <p>Para comprender cómo se establecen los flujos de comunicación, es fundamental segmentar las tecnologías según su naturaleza operativa:</p>
+
+            <h3>Motores de Bases de Datos Relacionales y NoSQL</h3>
+            <ul>
+                <li><strong>SQL:</strong> No representa una base de datos por sí misma, sino que constituye el lenguaje estandarizado de consultas estructuradas utilizado para operar sistemas de bases de datos relacionales.</li>
+                <li><strong>MySQL, PostgreSQL y MariaDB:</strong> Son sistemas de gestión basados en la arquitectura cliente-servidor. Operan de manera persistente escuchando peticiones concurrentes en puertos TCP/IP específicos de la red (ej. PostgreSQL usa por defecto el 5432 y MySQL/MariaDB el 3306).</li>
+                <li><strong>SQLite:</strong> Diferencia su arquitectura al no requerir un esquema de red ni un proceso servidor independiente. La base de datos es un único archivo físico (con extensiones como <code>.db</code> o <code>.sqlite</code>) integrado directamente en el espacio de almacenamiento de la aplicación cliente.</li>
+                <li><strong>Cassandra:</strong> Pertenece a la familia NoSQL orientada a columnas de carácter distribuido. No utiliza SQL unconventional, sino un lenguaje propio denominado CQL (Cassandra Query Language), conectándose mediante clusters y nodos de alta disponibilidad.</li>
+            </ul>
+
+            <h3>Herramientas de Ecosistema y ORMs</h3>
+            <ul>
+                <li><strong>Prisma 7:</strong> Funciona como un ORM de rendimiento optimizado para Node.js y TypeScript. Interpreta un esquema de configuración donde se define una URL de conexión e interactúa de manera transparente abstrayendo la sintaxis SQL en funciones fuertemente tipadas.</li>
+                <li><strong>JSON Server:</strong> Levanta un servidor web local liviano que expone rutas operando bajo peticiones HTTP (GET, POST, PUT, DELETE) y persistiendo los datos directamente en un archivo plano estructurado de extensión <code>.json</code>.</li>
+                <li><strong>HeidiSQL:</strong> Corresponde a una interfaz gráfica de usuario (GUI) de escritorio. No almacena datos; se conecta a motores de base de datos locales o remotos actuando como cliente, requiriendo credenciales explícitas de acceso (host, puerto, usuario y contraseña).</li>
+                <li><strong>XAMPP:</strong> Se define como una distribución de entorno local. No realiza conexiones externas por sí mismo, sino que aloja, configura e inicia de forma centralizada las instancias locales del servidor web Apache y el motor MariaDB.</li>
+            </ul>
+
+            <h2>3. Implementación Práctica de Códigos de Conexión</h2>
+            <p>A continuación se detallan los bloques de código requeridos para inicializar conexiones estables en los entornos solicitados:</p>
+
+            <h3>C# — Conexión a SQL Server (Mediante ADO.NET)</h3>
+<pre><span class="code-keyword">using</span> System;
+<span class="code-keyword">using</span> Microsoft.Data.SqlClient; <span class="code-comment">// Paquete NuGet Microsoft.Data.SqlClient</span>
+
+<span class="code-keyword">class</span> Program
+{
+    <span class="code-keyword">static void</span> Main()
+    {
+        <span class="code-keyword">string</span> connectionString = <span class="code-string">"Server=localhost; Database=MiBaseDatos; User Id=sa; Password=Password123; TrustServerCertificate=True;"</span>;
+
+        <span class="code-comment">// Estructura 'using' garantiza el cierre automático del canal de datos</span>
+        <span class="code-keyword">using</span> (<span class="code-type">SqlConnection</span> connection = <span class="code-keyword">new</span> <span class="code-type">SqlConnection</span>(connectionString))
+        {
+            <span class="code-keyword">try</span>
+            {
+                connection.Open();
+                Console.WriteLine(<span class="code-string">"Conexión establecida exitosamente a SQL Server."</span>);
+            }
+            <span class="code-keyword">catch</span> (<span class="code-type">Exception</span> ex)
+            {
+                Console.WriteLine(<span class="code-string">"Fallo en la conexión: "</span> + ex.Message);
+            }
+        }
+    }
+}</pre>
+
+            <h3>JavaScript (Node.js) — Conexión a PostgreSQL</h3>
+<pre><span class="code-keyword">const</span> { Client } = require(<span class="code-string">'pg'</span>); <span class="code-comment">// Instalación previa: npm install pg</span>
+
+<span class="code-keyword">const</span> client = <span class="code-keyword">new</span> Client({
+    user: <span class="code-string">'postgres'</span>,
+    host: <span class="code-string">'localhost'</span>,
+    database: <span class="code-string">'mi_base_datos'</span>,
+    password: <span class="code-string">'seguridad123'</span>,
+    port: 5432,
+});
+
+client.connect()
+    .then(() => {
+        console.log(<span class="code-string">'Conexión exitosa a la instancia de PostgreSQL.'</span>);
+        <span class="code-keyword">return</span> client.end(); <span class="code-comment">// Cierre limpio de la sesión</span>
+    })
+    .catch(err => console.error(<span class="code-string">'Error crítico en la conexión:'</span>, err.stack));</pre>
+
+            <h3>Python — Conexión a MySQL</h3>
+<pre><span class="code-keyword">import</span> mysql.connector <span class="code-comment">// Instalación previa: pip install mysql-connector-python</span>
+
+<span class="code-keyword">try</span>:
+    conexion = mysql.connector.connect(
+        host=<span class="code-string">"localhost"</span>,
+        user=<span class="code-string">"root"</span>,
+        password=<span class="code-string">"configroot"</span>,
+        database=<span class="code-string">"sistema_datos"</span>
+    )
+
+    <span class="code-keyword">if</span> conexion.is_connected():
+        print(<span class="code-string">"Conexión exitosa al motor de base de datos MySQL."</span>)
+        conexion.close() <span class="code-comment">// Cierre preventivo del flujo de red</span>
+
+<span class="code-keyword">except</span> Exception <span class="code-keyword">as</span> ex:
+    print(f<span class="code-string">"Error en la inicialización de interfaz: {ex}"</span>)</pre>
+
+            <h3>Consumo de API de Simulación (JSON Server mediante JavaScript Fetch)</h3>
+            <p>Debido a que JSON Server actúa exponiendo servicios mediante la arquitectura web estándar, su comunicación se establece procesando peticiones HTTP tradicionales de la siguiente manera:</p>
+<pre><span class="code-comment">// Instancia corriendo localmente mediante: json-server --watch db.json --port 3000</span>
+<span class="code-keyword">const</span> endpoint = <span class="code-string">'http://localhost:3000/usuarios'</span>;
+
+<span class="code-comment">// Conexión lógica mediante el método de transferencia nativo Fetch de HTTP</span>
+fetch(endpoint)
+    .then(response => response.json())
+    .then(data => {
+        console.log(<span class="code-string">'Estructura de datos recuperada desde JSON Server:'</span>, data);
+    })
+    .catch(error => console.error(<span class="code-string">'Error al procesar la petición HTTP:'</span>, error));</pre>
+        </div>
+    </div>
+
+</body>
+</html>
